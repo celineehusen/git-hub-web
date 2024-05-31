@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MyGit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      #info {
+        width: 400px;
+      }
+
+      .err {
+        padding: 10px;
+        text-align: center;
+        margin: 0;
+        width: 400px;
+      }
+
+      .err p {
+        margin: 0;
+      }
+
+      .card {
+        padding: 50px;
+      }
+
+      button {
+        margin-left: 0;
+      }
+
+      .field {
+        margin-bottom: 1.5rem;
+      }
+
+      .user {
+        border-radius: 100px;
+        text-align: center;
+        padding: 30px;
+      }
+    </style>
+
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script>
+      let allDevelopers = [];
+
+      function navigate() {
+        window.open("index.html", "_self");
+      }
+
+      function onSave() {
+        const developerId = $("#developerId").val();
+        const homePageUrl = $("#homePageUrl").val();
+        const location = $("#location").val();
+
+        console.log("input", developerId, homePageUrl, location);
+        if (!(developerId && homePageUrl && location)) {
+          alert("Please fill in form.");
+          return;
+        }
+        if (!("indexedDB" in window)) {
+          displayError("IndexedDB is not supported.");
+          return;
+        }
+
+        if (!/(http(s?)):\/\//i.test(homePageUrl)) {
+          alert("Home page URL must start only with “HTTP://” or “HTTPS://”");
+          return;
+        }
+
+        save(developerId, homePageUrl, location);
+      }
+
+      function save(developerId, homePageUrl, location) {
+        let openRequest = indexedDB.open("database");
+        openRequest.onupgradeneeded = () => {};
+
+        openRequest.onerror = () => {
+          displayError(openRequest.error);
+        };
+
+        openRequest.onsuccess = () => {
+          $("#developerId").val("");
+          $("#homePageUrl").val("");
+          $("#location").val("");
+
+          let db = openRequest.result;
+          if (!db.objectStoreNames.contains("developers")) {
+            db.createObjectStore("developers", { keyPath: "id" });
+          }
+          let trans = db.transaction("developers", "readwrite");
+          let developers = trans.objectStore("developers");
+          let developer = {
+            id: developerId,
+            homePageUrl: homePageUrl,
+            location: location,
+          };
+          let request = developers.add(developer);
+          request.onsuccess = () => {
+            console.log("success");
+            getAllDevelopers();
+          };
+
+          request.onerror = (event) => {
+            if ((request.error.name = "ConstraintError")) {
+              displayError("Developer with such id is already exists.");
+              event.preventDefault();
+            } else {
+              displayError(request.error);
+            }
+          };
+
+          trans.oncomplete = () => {
+            console.log("complete");
+          };
+
+          trans.onabort = () => {
+            displayError(trans.error);
+          };
+        };
+      }
+
+      function displayError(err) {
+        $("#err").fadeIn();
+        $("#err").empty().append(`<div class="err"><p>${err}</p></div>`);
+        $("#err").css("background-color", "#dc3545");
+        $("#err").fadeOut(5000);
+      }
+
+      function displayDevelopers(developers) {
+        $("#dev").empty();
+        developers.forEach((s) => {
+          $("#dev").append(`
+            <div class="user" style='display: block;'>
+              <p class='username'>${s?.id}</p>
+              <p class='link'>${s?.homePageUrl}</p>
+              <p class='chip'>${s?.location}</p>
+            </div>
+          `);
+        });
+      }
+
+      function deleteDeveloper(devId) {
+        let openRequest = indexedDB.open("database", 2);
+        if (devId) {
+          openRequest.onsuccess = () => {
+            let db = openRequest.result;
+            let trans = db.transaction("developers", "readwrite");
+            let developers = trans.objectStore("developers");
+            let deleteReq = developers.delete(devId);
+            deleteReq.onsuccess = () => {
+              alert("The developer has been removed.");
+              $("#delete-id").val("");
+              getAllDevelopers();
+            };
+          };
+        }
+      }
+
+      function deleteLastEntry() {
+        let openRequest = indexedDB.open("database", 2);
+        openRequest.onsuccess = () => {
+          let db = openRequest.result;
+          let trans = db.transaction("developers");
+          let developers = trans.objectStore("developers");
+          const myDev = developers.getAll();
+          myDev.onsuccess = () => {
+            const lastEntry = myDev.result[myDev.result.length - 1];
+            if (lastEntry?.id) {
+              let db = openRequest.result;
+              let trans = db.transaction("developers", "readwrite");
+              let developers = trans.objectStore("developers");
+              let deleteReq = developers.delete(lastEntry?.id);
+              deleteReq.onsuccess = () => {
+                alert("The developer has been removed.");
+                getAllDevelopers();
+              };
+            }
+          };
+          console.log("myDev", myDev);
+        };
+      }
+
+      function deleteAll() {
+        let openRequest = indexedDB.open("database", 2);
+
+        openRequest.onsuccess = () => {
+          let db = openRequest.result;
+          let trans = db.transaction("developers", "readwrite");
+          let developers = trans.objectStore("developers");
+          let all = developers.clear();
+          all.onsuccess = () => {
+            alert("All developers have been removed.");
+            getAllDevelopers();
+          };
+        };
+      }
+
+      function getAllDevelopers() {
+        let openRequest = indexedDB.open("database", 2);
+        openRequest.onupgradeneeded = () => {
+          let db = openRequest.result;
+          const objectStore = db.createObjectStore("developers", {
+            keyPath: "id",
+          });
+        };
+        openRequest.onsuccess = () => {
+          let db = openRequest.result;
+          let trans = db.transaction("developers");
+          let developers = trans.objectStore("developers");
+          const myDev = developers.getAll();
+          myDev.onsuccess = () => {
+            displayDevelopers(myDev.result);
+          };
+          console.log("myDev", myDev);
+          return myDev;
+        };
+      }
+    </script>
+  </head>
+  <body onload="getAllDevelopers()">
+    <div class="top-nav">
+      <img
+        src="assets/logo-white.png"
+        alt="GitHub"
+        id="header-logo"
+        class="clickable"
+        onclick="navigate()"
+      />
+    </div>
+    <div class="container developer">
+      <img src="assets/download.png" alt="" class="img-bg" />
+      <h1>My Developers</h1>
+      <div id="dev"></div>
+    </div>
+    <div class="card" id="err" hidden></div>
+    <div class="card">
+      <div id="info">
+        <h3>ADD DEVELOPER</h3>
+        <div class="field">
+          <p>Developer ID</p>
+          <div class="search-bar">
+            <input
+              type="text"
+              placeholder="Your Unique DeveloperID"
+              id="developerId"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <p>Home Page URL</p>
+          <div class="search-bar">
+            <input
+              type="text"
+              placeholder="HTTP:// or HTTPS://"
+              id="homePageUrl"
+            />
+          </div>
+        </div>
+        <div class="field">
+          <p>Location</p>
+          <div class="search-bar">
+            <input
+              type="text"
+              placeholder="Location - Ex: Sydney, Australia"
+              id="location"
+            />
+          </div>
+        </div>
+        <button onclick="onSave()" class="clickable">Save</button>
+      </div>
+    </div>
+    <div class="card" style="margin-top: 3rem; margin-bottom: 3rem;">
+      <div id="info">
+        <h3>DELETE DEVELOPER</h3>
+        <div class="field text-center">
+          <p>By ID</p>
+          <div class="search-bar">
+            <input type="text" placeholder="DeveloperID" id="delete-id" />
+          </div>
+          <button
+            class="clickable"
+            style="margin-top: 1rem"
+            onclick="deleteDeveloper($('#delete-id').val())"
+          >
+            Delete
+          </button>
+        </div>
+        <div class="field text-center">
+          <p>OR</p>
+          <button class="clickable" onclick="deleteLastEntry()">
+            Delete Last Entry
+          </button>
+        </div>
+        <div class="field text-center">
+          <p>OR</p>
+          <button class="clickable" onclick="deleteAll()">Delete All</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

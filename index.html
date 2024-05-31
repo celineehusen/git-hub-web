@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Github</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .connect {
+        background-color: rgb(247, 238, 238);
+        color: #15213f;
+      }
+
+      .search {
+        margin-right: 4rem;
+      }
+
+      .top-nav {
+        display: flex;
+        justify-content: space-between;
+      }
+
+      #header-logo {
+        margin-left: 150px;
+      }
+    </style>
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+      function randomize() {
+        setInterval(() => displayUsers(), 30000);
+      }
+
+      function navigate(username) {
+        if(username === 'mygit'){
+          window.open(`developer.html`);
+          return;
+        }
+        if (username) {
+          window.open(`profile.html?login=${username}`);
+        } else {
+          const usname = $("#username-input").val();
+          window.open(`profile.html?login=${usname}`);
+        }
+      }
+
+      async function displayUsers() {
+        $("#result").empty();
+        const topUsers = await getTopUsers();
+        topUsers.forEach((user) => {
+          user.then((s) => {
+            $("#result").append(`
+            <div class='user'>
+              <div class='avatar'>
+                <img src='${s?.avatar_url}' />
+              </div>
+              <div class='info'>
+                <div class='row'>
+                  <p class='username' onclick=navigate('${s?.login}')>${
+              s?.login
+            }</p>
+                  <p class='hint'>${s?.site_admin ? "Admin" : "User"}</p>
+                </div>
+                <div class='row' style='justify-content: space-between;'>
+                  <p>${s?.name}</p>
+                  <p class='chip'>${s?.location}</p>
+                </div>
+                <div class='row'>
+                  <p class='link'>${s?.blog ? s?.blog : null}</p>
+                </div>
+              </div>
+            </div>
+            `);
+          });
+        });
+      }
+    </script>
+  </head>
+  <body onload="displayUsers(); randomize()">
+    <div class="top-nav">
+      <img src="assets/logo-white.png" alt="GitHub" id="header-logo" />
+      <div class="my-git clickable" onclick="navigate('mygit')">
+        <p>MyGit</p>
+      </div>
+    </div>
+    <div class="container">
+      <img src="assets/download.png" alt="" class="img-bg" />
+      <h1>Highlighted<br />GitHub Developers</h1>
+      <!-- to display user information -->
+      <div id="result"></div>
+    </div>
+
+    <div class="container connect">
+      <h1>
+        Let's connect, <br />
+        GitHub Community
+      </h1>
+      <div class="search-bar">
+        <input type="text" placeholder="Username" id="username-input" />
+        <button onclick="navigate()" class="clickable">Search</button>
+      </div>
+    </div>
+  </body>
+</html>
