@@ -1,0 +1,222 @@
+body {
+  background-color:  #0c162d;
+  color: white;
+  font-family: 'Montserrat', sans-serif;
+  padding-top: 60px;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+  margin-right: 10px;
+  margin-bottom: 5px;
+}
+
+h1 {
+  font-size: 60px;
+  text-align: center;
+}
+
+.container {
+  padding: 50px;
+}
+
+.username {
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.username:hover {
+  text-decoration: underline;
+}
+
+.user {
+  border: 1px solid #424b5b;
+  border-radius: 60px;
+  display: flex;
+  margin-top: 20px;
+  width: 800px;
+  padding: 15px;
+  background-color:  #15213f;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 3px 3px 8px #0d1117;
+}
+
+.info {
+  width: 100%;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+.user img{
+  width: 60px;
+  border-radius: 60px;
+  margin-left: 10px;
+}
+
+.top-nav {
+  height: 60px;
+  position: fixed;
+  top: 0;
+  padding-top: 15px;
+  width: 100%;
+  z-index: 1;
+  text-align: center;
+  align-items: center;
+}
+
+#header-logo {
+  height: 100%;
+  width: 57px;
+  object-fit: cover;
+}
+
+.hint {
+  font-size: 10px;
+  opacity: 0.5;
+}
+
+.chip {
+  background-color: #2ea44f;
+  padding: 10px;
+  font-size: 10px;
+  border-radius: 20px;
+}
+
+.link {
+  color: #2ea44f;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.card {
+  background-color:  #15213f;
+  border: 1px solid #424b5b;
+  border-radius: 50px;
+  box-shadow: 3px 3px 10px #0d1117;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin: auto;
+}
+
+.login {
+  font-size: 25px;
+}
+
+#picture {
+  padding: 50px;
+}
+
+#picture img{
+  width: 250px;
+  border-radius: 250px;
+}
+
+.foll {
+  display: flex;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header {
+  display: flex;
+}
+
+.header button {
+  width: 150px;
+  margin-left: 20px;
+  text-transform: uppercase;
+  background-color: #2ea44f;
+  border-radius: 10px;
+  letter-spacing: 2px;
+  border: none;
+  color: white;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button {
+  margin-left: 0.5rem;
+  width: 150px;
+  height: 40px;
+  font-size: 16px;
+  background-color: #2ea44f;
+  border-radius: 5px;
+  letter-spacing: 2px;
+  border: none;
+  color: white;
+}
+
+.search-bar input {
+  width: 450px;
+  height: 40px;
+  box-sizing: border-box;
+  font-size: 16px;
+  background-color: #414a59;
+  padding: 10px;
+  padding-left: 25px;
+  color: white;
+  font-family: 'Courier New', Courier, monospace;
+  border-radius: 5px;
+  border: none;
+}
+
+.my-git {
+  margin-right: 150px;
+  border: 1px solid white;
+  width: 100px;
+  height: fit-content;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.my-git p {
+  margin: 0;
+  padding: 8px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.developer button {
+  width: 500px;
+  border-radius: 50px;
+}
+
+.field button {
+  width: 100%;
+}
+
+#err {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.img-bg {
+  position: absolute;
+  z-index: -1;
+  width: 100%;
+  top: 0;
+  left: 0;
+}

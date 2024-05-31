@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Github</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300;400;500;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      #info {
+        width: 400px;
+        padding-right: 50px;
+      }
+
+      .chip {
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .err {
+        padding: 10px;
+        text-align: center;
+        margin: 0;
+        width: 400px;
+      }
+
+      .err p {
+        margin: 0;
+      }
+    </style>
+
+    <script src="http://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+      function navigate() {
+        window.open("index.html", "_self");
+      }
+
+      function getSelectedUser() {
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const login = urlParams.get("login");
+        console.log(login);
+
+        getUserDetail(login)
+          .then((user) => {
+            if (user?.login) displayUser(user);
+            else throw Error("User not found");
+          })
+          .catch((err) => displayError(err));
+      }
+
+      function displayError(err) {
+        $(".card").empty().append(`<div class="err"><p>${err}</p></div>`);
+        $(".card").css("background-color", "#dc3545");
+      }
+
+      function displayUser(user) {
+        console.log("thisuser", user);
+        $("#picture").empty().append(`<img src='${user?.avatar_url}' />`);
+        $("#info")
+          .empty()
+          .append(
+            `
+            <div class='header'>
+              <p class='login'>${user?.login} <span class='hint'>${
+              user?.site_admin ? "Admin" : "User"
+            }</span></p>
+              <button>Follow</button>
+            </div>
+            `
+          );
+        $("#info").append(`
+          <div class='foll'>
+            <p>${user?.public_gists} public gists</p>
+            <p>${user?.followers} followers</p>
+            <p>${user?.following} following</p>
+          </div>`);
+        $("#info").append(`<p>${user?.name}</p>`);
+        $("#info").append(`<p class='bio'>${user?.bio ? user?.bio : null}</p>`);
+        $("#info").append(
+          `<p class='chip'>${user?.location ? user?.location : null}</p>`
+        );
+        $("#info").append(
+          `<p class='link'>${user?.blog ? user?.blog : null}</p>`
+        );
+      }
+    </script>
+  </head>
+  <body onload="getSelectedUser()">
+    <div class="top-nav">
+      <img
+        src="assets/logo-white.png"
+        alt="GitHub"
+        class="clickable"
+        id="header-logo"
+        onclick="navigate()"
+      />
+    </div>
+    <div class="container">
+      <h1>GitHub Profile</h1>
+      <!-- to display user information -->
+      <div class="card">
+        <div id="picture"></div>
+        <div id="info"></div>
+      </div>
+    </div>
+  </body>
+</html>
